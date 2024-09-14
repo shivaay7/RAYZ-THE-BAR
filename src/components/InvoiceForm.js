@@ -122,7 +122,7 @@ class InvoiceForm extends React.Component {
   };
 
   onCurrencyChange = (event) => {
-    this.setState({ currency: event.target.value });
+        this.setState({ currency: event.target.value });
   };
 
   openModal = (event) => {
@@ -215,7 +215,18 @@ class InvoiceForm extends React.Component {
                   </div>
                 </Col>
                 <Col lg={6}>
-                  <PaymentButtons/>
+                    <PaymentButtons
+                        invoiceNumber={this.state.invoiceNumber}
+                        billTo={this.state.billTo}
+                        billToEmail={this.state.billToEmail}
+                        billToAddress={this.state.billToAddress}
+                        items={this.state.items}
+                        subTotal={this.state.subTotal}
+                        taxAmount={this.state.taxAmmount}
+                        discountAmount={this.state.discountAmmount}
+                        total={this.state.total}
+                        currency={this.state.currency}
+                    />
                 </Col>
               </Row>
 
