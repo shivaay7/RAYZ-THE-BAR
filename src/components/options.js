@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css'; 
-import { sendPaymentLink } from './PaymentAPI';
+import { payViaPos, sendPaymentLink } from './PaymentAPI';
+import alert from "sweetalert";
 
 const PaymentButtons = (props) => {
+
+  
   const [selectedOption, setSelectedOption] = useState('');
 
   const handleRadioChange = (event) => {
@@ -26,8 +29,25 @@ const PaymentButtons = (props) => {
       total: props.total,
       currency: props.currency,
     };
-  
-    sendPaymentLink(event,invoiceData)
+
+    switch (selectedOption) {
+      case 'POS':
+        payViaPos(event,invoiceData)
+        setSelectedOption(""); 
+        break;
+      case 'Link':
+        sendPaymentLink(event,invoiceData)
+        setSelectedOption(""); break;
+      case 'Cash':
+        alert({icon:"success",title:"Payment is Successfull",dangerMode:false,confirmButtonText:"ok"})
+        setSelectedOption(""); break;
+      default:
+        alert({
+          icon: "error", title: "Please Choose Appropiate Option to Pay", dangerMode: true, confirmButtonText: "ok",
+        });
+        setSelectedOption(""); 
+        
+    }
     console.log(`Paying now using: ${selectedOption}`);
   };
 
