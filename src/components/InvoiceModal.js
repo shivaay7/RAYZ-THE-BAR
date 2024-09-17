@@ -59,11 +59,11 @@ class InvoiceModal extends React.Component {
                   <div className="fw-bold">Billed to:</div>
                   <div>{this.props.info.billTo||''}</div>
                   <div>{this.props.info.billToAddress||''}</div>
-                  <div>{this.props.info.billToEmail||''}</div>
+                  <div>{this.props.info.billToNumber||''}</div>
                 </Col>
                 <Col md={6}>
                   <div className="fw-bold mt-2 text-end">Date Of Issue:</div>
-                  <div className="text-end">{this.props.info.dateOfIssue||''}</div>
+                  <div className="text-end">{new Date().toLocaleDateString()||''}</div>
                 </Col>
               </Row>
               <Table className="mb-0">
