@@ -153,10 +153,10 @@ class InvoiceForm extends React.Component {
                       <span className="current-date">{new Date().toLocaleDateString()}</span>
                     </div>
                   </div>
-                  <div className="d-flex flex-row align-items-center mb-1">
-                    <span className="fw-bold d-block me-2">Due&nbsp;Date:</span>
-                    <Form.Control type="date" value={this.state.dateOfIssue} name={"dateOfIssue"} onChange={(event) => this.editField(event)} style={{ maxWidth: '150px' }} required="required" />
-                  </div>
+                  // <div className="d-flex flex-row align-items-center mb-1">
+                  //   <span className="fw-bold d-block me-2">Due&nbsp;Date:</span>
+                  //   <Form.Control type="date" value={this.state.dateOfIssue} name={"dateOfIssue"} onChange={(event) => this.editField(event)} style={{ maxWidth: '150px' }} required="required" />
+                  // </div>
                 </div>
                 <div className="d-flex flex-row align-items-center ">
                   <span className="fw-bold me-2">Invoice&nbsp;Number:&nbsp;</span>
