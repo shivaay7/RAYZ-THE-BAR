@@ -5,7 +5,7 @@ import { getCurrencyName } from "../utils/Utils";
 // Payment Link API
 const buildApiPayloadForPayViaLink = (invoiceData) => {
     return {
-        amount: parseInt(invoiceData.total),
+        amount: parseInt(invoiceData.total)*100,
         currency: getCurrencyName(invoiceData.currency),
         accept_partial: false,
         expire_by: getExpirationTime(),  
@@ -35,6 +35,7 @@ const buildApiPayloadForPayViaDevice = (invoiceData) => {
     const payload = {
         "appKey": "a9243bf7-659a-48aa-87e3-7dfde972ce72",
         "username": "8668776491",
+        "amount":invoiceData.total,
         "customerMobileNumber": invoiceData.billToEmail || '+916395450853',  //TODO : Mobile Number Field Required
         "externalRefNumber": invoiceData.invoiceNumber.toString(),
         "externalRefNumber2": "",
