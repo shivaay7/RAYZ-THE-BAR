@@ -4,7 +4,6 @@ import { getCurrencyName } from "../utils/Utils";
 
 // Payment Link API
 const buildApiPayloadForPayViaLink = (invoiceData) => {
-
     return {
         amount: parseInt(invoiceData.total),
         currency: getCurrencyName(invoiceData.currency),
@@ -15,7 +14,7 @@ const buildApiPayloadForPayViaLink = (invoiceData) => {
         customer: {
           name: invoiceData.billTo || 'Dummy',
           contact: invoiceData.billToEmail || '+916395450853',  //TODO : Which Value Needs to be Populated
-          email: invoiceData.billToAddress || 'abhishek.borana@razorpay.com',   
+          email: 'abhishek.borana@razorpay.com',   
         },
         notify: {
             sms: true,
