@@ -2,11 +2,27 @@ import alert from "sweetalert";
 import axios from 'axios';
 import { getCurrencyName } from "../utils/Utils";
 
+var apiData = () => {
+  const remoteData = {
+    paymentLinkApiRemote : 'https://catalyst.dev.razorpay.in/tctp/pay/O7y28zjlkDgTxE',
+    posApiRemote : 'https://catalyst.dev.razorpay.in/tctp/pay/O7y28zjlkDgTxEs',
+
+    paymentLinkApiLocal: 'http://localhost:8083/tctp/pay/O7y28zjlkDgTxE',
+    posApiUrl: 'http://localhost:8083/tctp/pay/O7y28zjlkDgTxEs',
+    headers : {
+      "rzpctx-dev-serve-user": "pos-dev",
+      "content-type": "application/json"
+    }
+  }
+  return remoteData
+}
+
+
 // Payment Link API
 const buildApiPayloadForPayViaLink = (invoiceData) => {
 
     return {
-        amount: parseInt(invoiceData.total),
+        amount: parseInt(invoiceData.total)*100,
         currency: getCurrencyName(invoiceData.currency),
         accept_partial: false,
         expire_by: getExpirationTime(),  
@@ -14,8 +30,8 @@ const buildApiPayloadForPayViaLink = (invoiceData) => {
         description: `Payment for policy no #23456`, //TODO : Which Value Needs to be Populated
         customer: {
           name: invoiceData.billTo || 'Dummy',
-          contact: invoiceData.billToEmail || '+916395450853',  //TODO : Which Value Needs to be Populated
-          email: invoiceData.billToAddress || 'abhishek.borana@razorpay.com',   
+          contact: invoiceData.billToEmail,  //TODO : Which Value Needs to be Populated
+          email: 'abhishek.borana@razorpay.com',   
         },
         notify: {
             sms: true,
@@ -34,15 +50,15 @@ const buildApiPayloadForPayViaLink = (invoiceData) => {
 const buildApiPayloadForPayViaDevice = (invoiceData) => {
 
     const payload = {
-        "appKey": "a9243bf7-659a-48aa-87e3-7dfde972ce72",
-        "username": "8668776491",
+        "appKey": "2025ba5a-4c7b-43e7-bdd0-fedbe0f60a60",
+        "username": "8871703637",
         "customerMobileNumber": invoiceData.billToEmail || '+916395450853',  //TODO : Mobile Number Field Required
         "externalRefNumber": invoiceData.invoiceNumber.toString(),
         "externalRefNumber2": "",
         "externalRefNumber3": "",
         "paymentMode" : "CARD", //TODO : Payment Mode Field Required
         "pushTo": {
-            "deviceId": "1491843883|ezetap_android"
+            "deviceId": "1495073904|ezetap_android"
         }
     }
 	
@@ -55,14 +71,17 @@ const buildApiPayloadForPayViaDevice = (invoiceData) => {
     event.preventDefault();
 
     const payload = buildApiPayloadForPayViaLink(invoiceData)
+    
+    const apiUrl = apiData()
 
-    const url = 'http://localhost:8083/tctp/pay/O7y28zjlkDgTxE';
+    const url = apiUrl.paymentLinkApiRemote
 
     try {
         const response = await axios.post(url, payload, {
           headers: {
             "content-type": "application/json",
             "Authorization":"Basic cnpwX3Rlc3RfM1lKRzBHSU1mUGZmR1c6RVV2WjZuaW92QkhWMjZJWGg4elpkemE5",
+            "rzpctx-dev-serve-user": "pos-dev",
           }
         });
         if (response?.data?.status === "failed") {
@@ -84,15 +103,15 @@ const buildApiPayloadForPayViaDevice = (invoiceData) => {
 export const payViaPos = async (event,invoiceData) => {
     event.preventDefault(); 
 
-    const url = 'http://localhost:8083/tctp/pay/O7y28zjlkDgTxEs';
+    const apiUrl = apiData()
+    
+    const url = apiUrl.posApiRemote
 
     const payload =buildApiPayloadForPayViaDevice(invoiceData)
 
     try {
         const response = await axios.post(url, payload, {
-          headers: {
-            "content-type": "application/json"
-          }
+          headers: apiUrl.headers
         });
         if (response?.data?.pos_response?.success === false) {
           return alert({
@@ -112,5 +131,15 @@ export const payViaPos = async (event,invoiceData) => {
     now.setMinutes(now.getMinutes() + 15); 
     return now.getTime(); 
   };
+
+
+export const collectApi = (event,invoiceData) =>{
+    event.preventDefault();
+
+    // const url = 'https://api.razorpay.com/v1/payments/create/json';
+
+
+}
+
 
 
