@@ -57,7 +57,6 @@ const buildApiPayloadForPayViaDevice = (invoiceData) => {
         "externalRefNumber": invoiceData.invoiceNumber.toString(),
         "externalRefNumber2": "",
         "externalRefNumber3": "",
-        "paymentMode" : "CARD", //TODO : Payment Mode Field Required
         "pushTo": {
             "deviceId": "1495073904|ezetap_android"
         }
