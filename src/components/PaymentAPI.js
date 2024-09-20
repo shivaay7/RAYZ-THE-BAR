@@ -4,9 +4,7 @@ import { getCurrencyName } from "../utils/Utils";
 
 var apiData = () => {
   const remoteData = {
-    paymentLinkApiRemote : 'https://catalyst.dev.razorpay.in/tctp/pay/O7y28zjlkDgTxE',
-    posApiRemote : 'https://catalyst.dev.razorpay.in/tctp/pay/O7y28zjlkDgTxEs',
-
+   
     collectApiLocal:'http://localhost:8083/tctp/updateStatus',
     paymentLinkApiLocal: 'http://localhost:8083/tctp/pay/O7y28zjlkDgTxE',
     posApiUrl: 'http://localhost:8083/tctp/pay/O7y28zjlkDgTxEs',
@@ -32,7 +30,7 @@ const buildApiPayloadForPayViaLink = (invoiceData) => {
         customer: {
           name: invoiceData.billTo || 'Dummy',
           contact: invoiceData.billToNumber,  //TODO : Which Value Needs to be Populated
-          email: 'abhishek.borana@razorpay.com',   
+          email: 'kiratox796@ofionk.com',   
         },
         notify: {
             sms: true,
@@ -42,7 +40,7 @@ const buildApiPayloadForPayViaLink = (invoiceData) => {
         notes: {
             "Paid To": "Total Amount To Be Paid"
         }, //TODO : Which Value Needs to be Populated,
-        callback_url: 'https://solutions.ext.dev.razorpay.in/',
+        callback_url: 'https://webhook.site/b8194d31-b87c-43ec-a5e0-2374fa482aea',
         callback_method: 'get',
     }
 
