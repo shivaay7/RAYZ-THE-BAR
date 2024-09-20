@@ -288,6 +288,9 @@ class InvoiceForm extends React.Component {
                     currency={this.state.currency}
                   />
                 </Col>
+                
+                
+                
               </Row>
 
               <hr className="my-4" />
