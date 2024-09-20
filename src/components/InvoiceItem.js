@@ -44,7 +44,7 @@ class ItemRow extends React.Component {
   render() {
     return (
       <tr>
-        <td style={{width: '100%'}}>
+        <td style={{width: '75%'}}>
           <EditableField
             onItemizedItemEdit={this.props.onItemizedItemEdit}
             cellData={{
@@ -54,16 +54,7 @@ class ItemRow extends React.Component {
             value: this.props.item.name,
             id: this.props.item.id,
           }}/>
-          {/* befaltu ki dikat de raha tha */}
-          {/* <EditableField
-            onItemizedItemEdit={this.props.onItemizedItemEdit}
-            cellData={{
-            type: "text",
-            name: "description",
-            placeholder: "Item description",
-            value: this.props.item.description || '',
-            id: this.props.item.id
-          }}/> */}
+          
         </td>
         <td style={{minWidth: '70px'}}>
           <EditableField
