@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css'; 
-import { payViaPos, sendPaymentLink } from './PaymentAPI';
+import { payViaPos, sendPaymentLink , collectApi} from './PaymentAPI';
 import alert from "sweetalert";
 
 const PaymentButtons = (props) => {
@@ -20,7 +20,7 @@ const PaymentButtons = (props) => {
     const invoiceData = {
       invoiceNumber: props.invoiceNumber,
       billTo: props.billTo,
-      billToEmail: props.billToEmail,
+      billToNumber: props.billToNumber,
       billToAddress: props.billToAddress,
       items: props.items,
       subTotal: props.subTotal,
@@ -39,7 +39,7 @@ const PaymentButtons = (props) => {
         sendPaymentLink(event,invoiceData)
         setSelectedOption(""); break;
       case 'Cash':
-        alert({icon:"success",title:"Payment is Successfull",dangerMode:false,confirmButtonText:"ok"})
+        collectApi(event,invoiceData)
         setSelectedOption(""); break;
       default:
         alert({

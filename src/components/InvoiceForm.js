@@ -215,7 +215,7 @@ class InvoiceForm extends React.Component {
                     <PaymentButtons
                         invoiceNumber={this.state.invoiceNumber}
                         billTo={this.state.billTo}
-                        billToEmail={this.state.billToNumber}
+                        billToNumber={this.state.billToNumber}
                         billToAddress={this.state.billToAddress}
                         items={this.state.items}
                         subTotal={this.state.subTotal}
