@@ -1,6 +1,9 @@
 import alert from "sweetalert";
 import axios from 'axios';
 import { getCurrencyName } from "../utils/Utils";
+import { v4 as uuidv4 } from 'uuid';
+
+export let pay_link_id='id'
 
 var apiData = () => {
   const remoteData = {
@@ -20,12 +23,13 @@ var apiData = () => {
 // Payment Link API
 const buildApiPayloadForPayViaLink = (invoiceData) => {
 
+  const uniqueRefNumber = uuidv4();
     return {
         amount: parseInt(invoiceData.total)*100,
         currency: getCurrencyName(invoiceData.currency),
         accept_partial: false,
         expire_by: getExpirationTime(),  
-        reference_id: "TS1989", //TODO : Which Value Needs to be Populated
+        reference_id: uniqueRefNumber, //TODO : Which Value Needs to be Populated
         description: `Payment for policy no #23456`, //TODO : Which Value Needs to be Populated
         customer: {
           name: invoiceData.billTo || 'Dummy',
@@ -40,7 +44,7 @@ const buildApiPayloadForPayViaLink = (invoiceData) => {
         notes: {
             "Paid To": "Total Amount To Be Paid"
         }, //TODO : Which Value Needs to be Populated,
-        callback_url: 'https://webhook.site/b8194d31-b87c-43ec-a5e0-2374fa482aea',
+        callback_url: 'https://7f4b-2409-40f2-208d-98e1-6945-e318-c578-f4fd.ngrok-free.app/link-webhook',
         callback_method: 'get',
     }
 
@@ -55,6 +59,7 @@ const buildApiPayloadForPayViaDevice = (invoiceData) => {
         "username": "8871703637",
         "customerMobileNumber": invoiceData.billToNumber || '+916395450853',  //TODO : Mobile Number Field Required
         "externalRefNumber": invoiceData.invoiceNumber.toString(),
+        "amount":parseInt(invoiceData.total)*100,
         "externalRefNumber2": "",
         "externalRefNumber3": "",
         "pushTo": {
@@ -86,6 +91,8 @@ const collectApiPayload = (invoiceData) => {
     const apiUrl = apiData()
 
     const url = apiUrl.paymentLinkApiLocal
+    
+    pay_link_id =''
 
     try {
         const response = await axios.post(url, payload, {
@@ -100,6 +107,7 @@ const collectApiPayload = (invoiceData) => {
             icon: "error", title: response?.data?.response, dangerMode: true, confirmButtonText: "ok",
           });
         }
+        pay_link_id = response.data.id;
         return alert({icon:"success",title:"Link Sent",dangerMode:false,confirmButtonText:"ok"})
       } catch (error) {
         return alert({

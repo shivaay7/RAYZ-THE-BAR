@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css'; 
 import { payViaPos, sendPaymentLink } from './PaymentAPI';
+import {fetchPaymentLinkStatus} from './PaymentStatus'
 import alert from "sweetalert";
 
 const PaymentButtons = (props) => {
@@ -54,7 +55,7 @@ const PaymentButtons = (props) => {
         alert("Checked status for POS API");
         break;
       case 'Link':
-        alert("Checked status for Link API");
+        fetchPaymentLinkStatus()
         break;
       case 'Cash':
         alert("Checked status for Cash API");
