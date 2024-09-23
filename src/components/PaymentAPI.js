@@ -10,9 +10,9 @@ var apiData = () => {
    
     collectApiLocal:'http://localhost:8083/tctp/updateStatus',
     paymentLinkApiLocal: 'http://localhost:8083/tctp/pay/O7y28zjlkDgTxE',
-    posApiUrl: 'http://localhost:8083/tctp/pay/O7y28zjlkDgTxEs',
+    posApiUrl: 'http://localhost:4000/pos',
     headers : {
-      "rzpctx-dev-serve-user": "pos-dev",
+      "Access-Control-Allow-Origin":"*",
       "content-type": "application/json"
     }
   }
@@ -44,7 +44,7 @@ const buildApiPayloadForPayViaLink = (invoiceData) => {
         notes: {
             "Paid To": "Total Amount To Be Paid"
         }, //TODO : Which Value Needs to be Populated,
-        callback_url: 'https://7f4b-2409-40f2-208d-98e1-6945-e318-c578-f4fd.ngrok-free.app/link-webhook',
+        callback_url: 'https://8015-121-242-131-242.ngrok-free.app/link-webhook',
         callback_method: 'get',
     }
 
@@ -53,22 +53,13 @@ const buildApiPayloadForPayViaLink = (invoiceData) => {
 
 //POS API
 const buildApiPayloadForPayViaDevice = (invoiceData) => {
-
-    const payload = {
-        "appKey": "2025ba5a-4c7b-43e7-bdd0-fedbe0f60a60",
-        "username": "8871703637",
+   const uniqueRefNumber = uuidv4();
+    return {
         "customerMobileNumber": invoiceData.billToNumber || '+916395450853',  //TODO : Mobile Number Field Required
-        "externalRefNumber": invoiceData.invoiceNumber.toString(),
-        "amount":parseInt(invoiceData.total)*100,
+        "externalRefNumber": uniqueRefNumber,
+        "amount":invoiceData.total,
         "externalRefNumber2": "",
         "externalRefNumber3": "",
-        "pushTo": {
-            "deviceId": "1495073904|ezetap_android"
-        }
-    }
-	
-    return {
-      "pos_pay":payload
     }
 }
 
@@ -78,8 +69,8 @@ const collectApiPayload = (invoiceData) => {
    return {
     "amount":parseInt(invoiceData.total)*100,
     "currency":getCurrencyName(invoiceData.currency),
+    "vpa":invoiceData.vpa || 'aborana@ybl',
     "contact":invoiceData.billToNumber,
-    "vpa":invoiceData.vpa || 'aborana@ybl'
    }
 }
 
@@ -118,7 +109,7 @@ const collectApiPayload = (invoiceData) => {
 
 
 
-//   POS Api
+// POS Api
 export const payViaPos = async (event,invoiceData) => {
     event.preventDefault(); 
 
@@ -137,7 +128,7 @@ export const payViaPos = async (event,invoiceData) => {
             icon: "error", title: response?.data?.pos_response.message, dangerMode: true, confirmButtonText: "ok",
           });
         }
-        return alert({icon:"success",title:"Link Sent",dangerMode:false,confirmButtonText:"ok"})
+        return alert({icon:"success",title:"Payment Initiated, Check POS",dangerMode:false,confirmButtonText:"ok"})
       } catch (error) {
         return alert({
           icon: "error", title: "Something went wrong" + error, dangerMode: true, confirmButtonText: "ok",
@@ -159,12 +150,13 @@ export const collectApi = async (event,invoiceData) =>{
     
     const url = apiUrl.collectApiLocal
 
-    const payload =collectApiPayload(invoiceData)
+    const collectPayload =collectApiPayload(invoiceData)
 
     try {
-        const response = await axios.post(url, payload, {
+        const response = await axios.post(url, collectPayload, {
           headers: apiUrl.headers
         });
+
         if (response?.data?.success === false) {
           return alert({
             icon: "error", title: response?.data?.message, dangerMode: true, confirmButtonText: "ok",
