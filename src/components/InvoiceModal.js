@@ -7,7 +7,7 @@ import Table from 'react-bootstrap/Table';
 import Modal from 'react-bootstrap/Modal';
 import { BiPaperPlane, BiCloudDownload } from "react-icons/bi";
 import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf'
+import jsPDF from 'jspdf';
 
 function GenerateInvoice() {
   html2canvas(document.querySelector("#invoiceCapture")).then((canvas) => {
@@ -18,7 +18,7 @@ function GenerateInvoice() {
       format: [612, 792]
     });
     pdf.internal.scaleFactor = 1;
-    const imgProps= pdf.getImageProperties(imgData);
+    const imgProps = pdf.getImageProperties(imgData);
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
     pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
@@ -29,21 +29,51 @@ function GenerateInvoice() {
 class InvoiceModal extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      email: '', // State for email input
+      emailSent: false, // State to track if email was sent
+    };
   }
+
+  handleEmailChange = (event) => {
+    this.setState({ email: event.target.value });
+  };
+
+  sendInvoiceEmail = () => {
+    const { email } = this.state;
+    if (email) {
+      const subject = encodeURIComponent(`Invoice #${this.props.info.invoiceNumber}`);
+      const body = encodeURIComponent(`Please find the attached invoice.\n\nInvoice Details:\n\n` +
+        `Billed To: ${this.props.info.billTo}\n` +
+        `Amount Due: ₹${this.props.total}\n` +
+        `Date of Issue: ${new Date().toLocaleDateString()}\n` +
+        `Items: ${this.props.items.map(item => `${item.quantity} x ${item.name} - ₹${item.price * item.quantity}`).join(', ')}\n` +
+        `Total: ₹${this.props.total}`);
+
+      // Construct the mailto link
+      const mailtoLink = `mailto:${email}?subject=${subject}&body=${body}`;
+      window.location.href = mailtoLink; // Open the user's email client
+
+      this.setState({ emailSent: true, email: '' }); // Reset the state after sending
+    } else {
+      alert("Please enter a valid email address.");
+    }
+  };
+
   render() {
-    return(
+    return (
       <div>
         <Modal show={this.props.showModal} onHide={this.props.closeModal} size="lg" centered>
           <div id="invoiceCapture">
             <div className="d-flex flex-row justify-content-between align-items-start bg-light w-100 p-4">
               <div className="w-100">
-                <h4 className="fw-bold my-2">{this.props.info.billFrom||'ZUDIO'}</h4>
+                <h4 className="fw-bold my-2">{this.props.info.billFrom || 'ZUDIO'}</h4>
                 <h6 className="fw-bold text-secondary mb-1">
-                  Invoice #: {this.props.info.invoiceNumber||''}
+                  Invoice #: {this.props.info.invoiceNumber || ''}
                 </h6>
               </div>
               <div className="text-end ms-4">
-                <h6 className="fw-bold mt-1 mb-2">Amount&nbsp;Due:</h6>
+                <h6 className="fw-bold mt-1 mb-2">Amount Due:</h6>
                 <h5 className="fw-bold text-secondary"> {"₹"} {this.props.total}</h5>
               </div>
             </div>
@@ -51,13 +81,13 @@ class InvoiceModal extends React.Component {
               <Row className="mb-4">
                 <Col md={6}>
                   <div className="fw-bold">Billed to:</div>
-                  <div>{this.props.info.billTo||''}</div>
-                  <div>{this.props.info.billToAddress||''}</div>
-                  <div>{this.props.info.billToNumber||''}</div>
+                  <div>{this.props.info.billTo || ''}</div>
+                  <div>{this.props.info.billToAddress || ''}</div>
+                  <div>{this.props.info.billToNumber || ''}</div>
                 </Col>
                 <Col md={6}>
                   <div className="fw-bold mt-2 text-end">Date Of Issue:</div>
-                  <div className="text-end">{new Date().toLocaleDateString()||''}</div>
+                  <div className="text-end">{new Date().toLocaleDateString() || ''}</div>
                 </Col>
               </Row>
               <Table className="mb-0">
@@ -70,20 +100,14 @@ class InvoiceModal extends React.Component {
                   </tr>
                 </thead>
                 <tbody>
-                  {this.props.items.map((item, i) => {
-                    return (
-                      <tr id={i} key={i}>
-                        <td style={{width: '70px'}}>
-                          {item.quantity}
-                        </td>
-                        <td>
-                          {item.name} 
-                        </td>
-                        <td className="text-end" style={{width: '100px'}}>{"₹"}{item.price}</td>
-                        <td className="text-end" style={{width: '100px'}}>{"₹"} {item.price * item.quantity}</td>
-                      </tr>
-                    );
-                  })}
+                  {this.props.items.map((item, i) => (
+                    <tr id={i} key={i}>
+                      <td style={{ width: '70px' }}>{item.quantity}</td>
+                      <td>{item.name}</td>
+                      <td className="text-end" style={{ width: '100px' }}>{"₹"}{item.price}</td>
+                      <td className="text-end" style={{ width: '100px' }}>{"₹"} {item.price * item.quantity}</td>
+                    </tr>
+                  ))}
                 </tbody>
               </Table>
               <Table>
@@ -95,52 +119,66 @@ class InvoiceModal extends React.Component {
                   </tr>
                   <tr className="text-end">
                     <td></td>
-                    <td className="fw-bold" style={{width: '100px'}}>SUBTOTAL</td>
-                    <td className="text-end" style={{width: '100px'}}>{"₹"} {this.props.subTotal}</td>
+                    <td className="fw-bold" style={{ width: '100px' }}>SUBTOTAL</td>
+                    <td className="text-end" style={{ width: '100px' }}>{"₹"} {this.props.subTotal}</td>
                   </tr>
-                  {this.props.taxAmmount != 0.00 &&
+                  {this.props.taxAmmount !== 0.00 && (
                     <tr className="text-end">
                       <td></td>
-                      <td className="fw-bold" style={{width: '100px'}}>TAX</td>
-                      <td className="text-end" style={{width: '100px'}}>{"₹"} {this.props.taxAmmount}</td>
+                      <td className="fw-bold" style={{ width: '100px' }}>TAX</td>
+                      <td className="text-end" style={{ width: '100px' }}>{"₹"} {this.props.taxAmmount}</td>
                     </tr>
-                  }
-                  {this.props.discountAmmount != 0.00 &&
+                  )}
+                  {this.props.discountAmmount !== 0.00 && (
                     <tr className="text-end">
                       <td></td>
-                      <td className="fw-bold" style={{width: '100px'}}>DISCOUNT</td>
-                      <td className="text-end" style={{width: '100px'}}>{"₹"} {this.props.discountAmmount}</td>
+                      <td className="fw-bold" style={{ width: '100px' }}>DISCOUNT</td>
+                      <td className="text-end" style={{ width: '100px' }}>{"₹"} {this.props.discountAmmount}</td>
                     </tr>
-                  }
+                  )}
                   <tr className="text-end">
                     <td></td>
-                    <td className="fw-bold" style={{width: '100px'}}>TOTAL</td>
-                    <td className="text-end" style={{width: '100px'}}>{"₹"} {this.props.total}</td>
+                    <td className="fw-bold" style={{ width: '100px' }}>TOTAL</td>
+                    <td className="text-end" style={{ width: '100px' }}>{"₹"} {this.props.total}</td>
                   </tr>
                 </tbody>
               </Table>
-              {this.props.info.notes &&
+              {this.props.info.notes && (
                 <div className="bg-light py-3 px-4 rounded">
                   {this.props.info.notes}
-                </div>}
+                </div>
+              )}
             </div>
           </div>
+
           <div className="pb-4 px-4">
             <Row>
               <Col md={6}>
+                <input
+                  type="email"
+                  value={this.state.email}
+                  onChange={this.handleEmailChange}
+                  placeholder="Enter recipient email"
+                  className="form-control"
+                />
+                {this.state.emailSent && <div className="text-success">Invoice sent successfully!</div>}
               </Col>
               <Col md={6}>
                 <Button variant="outline-primary" className="d-block w-100 mt-3 mt-md-0" onClick={GenerateInvoice}>
-                  <BiCloudDownload style={{width: '16px', height: '16px', marginTop: '-3px'}} className="me-2"/>
+                  <BiCloudDownload style={{ width: '16px', height: '16px', marginTop: '-3px' }} className="me-2" />
                   Download Copy
+                </Button>
+                <Button variant="outline-success" className="d-block w-100 mt-3 mt-md-0" onClick={this.sendInvoiceEmail}>
+                  <BiPaperPlane style={{ width: '16px', height: '16px', marginTop: '-3px' }} className="me-2" />
+                  Send via Email
                 </Button>
               </Col>
             </Row>
           </div>
         </Modal>
-        <hr className="mt-4 mb-3"/>
+        <hr className="mt-4 mb-3" />
       </div>
-    )
+    );
   }
 }
 
