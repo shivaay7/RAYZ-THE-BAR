@@ -40,6 +40,18 @@ class InvoiceModal extends React.Component {
   };
 
   sendInvoiceEmail = () => {
+
+    const payload = {
+      "invoiceNumber":this.props.info.invoiceNumber,
+      "billTo":this.props.info.BillTo,
+      "billToAddress":this.props.info.billToAddress,
+      "items":this.props.info.item,
+      "discount":this.props.info.discountAmmount,
+      "taxAmount":this.props.info.taxAmmount,
+      "subTotal":this.props.info.subTotal,
+      "total":this.props.info.total,
+    }
+
     const { email } = this.state;
     if (email) {
       const subject = encodeURIComponent(`Invoice #${this.props.info.invoiceNumber}`);
@@ -156,7 +168,7 @@ class InvoiceModal extends React.Component {
               <Col md={6}>
                 <input
                   type="email"
-                  value={this.state.email}
+                  value={this.props.info.billToAddress}
                   onChange={this.handleEmailChange}
                   placeholder="Enter recipient email"
                   className="form-control"

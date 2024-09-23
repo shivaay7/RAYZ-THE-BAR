@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css'; 
-import { payViaPos, sendPaymentLink } from './PaymentAPI';
+import { payViaPos, sendPaymentLink,collectApi } from './PaymentAPI';
+import {fetchPaymentLinkStatus} from './PaymentStatus';
 import alert from "sweetalert";
 
 const PaymentButtons = (props) => {
@@ -16,7 +17,7 @@ const PaymentButtons = (props) => {
     const invoiceData = {
       invoiceNumber: props.invoiceNumber,
       billTo: props.billTo,
-      billToEmail: props.billToEmail,
+      billToNumber: props.billToNumber,
       billToAddress: props.billToAddress,
       items: props.items,
       subTotal: props.subTotal,
@@ -24,6 +25,7 @@ const PaymentButtons = (props) => {
       discountAmount: props.discountAmount,
       total: props.total,
       currency: props.currency,
+      vpa:vpa,
     };
 
     switch (selectedOption) {
@@ -41,7 +43,7 @@ const PaymentButtons = (props) => {
         break;
       case 'VPA':
         // Handle VPA payment logic here
-        alert({icon: "success", title: `Payment via VPA (${vpa}) is Successful`, dangerMode: false, confirmButtonText: "ok"});
+        collectApi(event,invoiceData)
         setVpa(''); // Clear VPA input after payment
         setSelectedOption("");
         break;
@@ -61,6 +63,7 @@ const PaymentButtons = (props) => {
         alert("Checked status for POS API");
         break;
       case 'Link':
+        fetchPaymentLinkStatus()
         alert("Checked status for Link API");
         break;
       case 'Cash':
