@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css'; 
-import { collectApi, payViaPos, sendPaymentLink } from './PaymentAPI';
-import {fetchPaymentLinkStatus} from './PaymentStatus'
+import { payViaPos, sendPaymentLink } from './PaymentAPI';
 import alert from "sweetalert";
 
 const PaymentButtons = (props) => {
   const [selectedOption, setSelectedOption] = useState('');
+  const [vpa, setVpa] = useState(''); // State for VPA input
 
   const handleRadioChange = (event) => {
     setSelectedOption(event.target.value);
@@ -16,7 +16,7 @@ const PaymentButtons = (props) => {
     const invoiceData = {
       invoiceNumber: props.invoiceNumber,
       billTo: props.billTo,
-      billToNumber: props.billToNumber,
+      billToEmail: props.billToEmail,
       billToAddress: props.billToAddress,
       items: props.items,
       subTotal: props.subTotal,
@@ -36,8 +36,14 @@ const PaymentButtons = (props) => {
         setSelectedOption(""); 
         break;
       case 'Cash':
-        collectApi(event,invoiceData)
+        alert({icon: "success", title: "Payment is Successful", dangerMode: false, confirmButtonText: "ok"});
         setSelectedOption(""); 
+        break;
+      case 'VPA':
+        // Handle VPA payment logic here
+        alert({icon: "success", title: `Payment via VPA (${vpa}) is Successful`, dangerMode: false, confirmButtonText: "ok"});
+        setVpa(''); // Clear VPA input after payment
+        setSelectedOption("");
         break;
       default:
         alert({
@@ -55,10 +61,13 @@ const PaymentButtons = (props) => {
         alert("Checked status for POS API");
         break;
       case 'Link':
-        fetchPaymentLinkStatus()
+        alert("Checked status for Link API");
         break;
       case 'Cash':
         alert("Checked status for Cash API");
+        break;
+      case 'VPA':
+        alert("Checked status for VPA API");
         break;
       default:
         alert("Invalid payment method");
@@ -183,7 +192,7 @@ const PaymentButtons = (props) => {
                   className="form-check-label" 
                   style={{ fontSize: '18px' }}
                 >
-                  Pay via S2S
+                  Pay via Cash
                 </label>
               </div>
               <button
@@ -201,6 +210,60 @@ const PaymentButtons = (props) => {
                 Status
               </button>
             </div>
+
+            {/* Payment Option: Pay via VPA */}
+            <div 
+              style={{ ...paymentOptionStyle, ...(selectedOption === 'VPA' ? selectedStyle : {}) }} 
+              className="d-flex align-items-center justify-content-between mb-3"
+              onClick={() => setSelectedOption('VPA')}
+            >
+              <div className="d-flex align-items-center">
+                <input
+                  type="radio"
+                  id="payViaVPA"
+                  name="paymentOption"
+                  value="VPA"
+                  checked={selectedOption === 'VPA'}
+                  onChange={handleRadioChange}
+                  className="form-check-input me-2"
+                />
+                <label 
+                  htmlFor="payViaVPA" 
+                  className="form-check-label" 
+                  style={{ fontSize: '18px' }}
+                >
+                  Pay via VPA
+                </label>
+              </div>
+              <button
+                onClick={() => checkStatusApi('VPA')}
+                style={{
+                  backgroundColor: '#17a2b8',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '5px',
+                  padding: '5px 10px',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                }}
+              >
+                Status
+              </button>
+            </div>
+
+            {/* VPA Input Field */}
+            {selectedOption === 'VPA' && (
+              <div className="mb-3">
+                <input
+                  type="text"
+                  value={vpa}
+                  onChange={(e) => setVpa(e.target.value)}
+                  placeholder="Enter VPA (e.g., user@upi)"
+                  className="form-control"
+                  style={{ width: '100%', marginTop: '10px' }}
+                />
+              </div>
+            )}
 
             {/* Pay Now Button */}
             <button
